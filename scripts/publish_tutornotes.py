@@ -38,18 +38,25 @@ def convert(src_file, out_dir, prefix, build_dir):
     diag_dir = os.path.join(out_dir, "diagrams")
     os.makedirs(diag_dir, exist_ok=True)
     lines = open(src_file, encoding="utf-8").read().split("\n")
-    out, i, example, k, count = [], 0, "top", 0, 0
+    out, i, example, k, count, section, used = [], 0, "top", 0, 0, 0, set()
     while i < len(lines):
         line = lines[i]
+        if line.startswith("# "):
+            section += 1
         m = re.match(r"^## Example (\S+)", line)
         if m:
             example, k = m.group(1), 0
+            if "-" not in example:  # "Example 1" -> "1-1" so sections don't overwrite each other
+                example = f"{section}-{example}"
         if line.startswith("```tikz"):
             j = i + 1
             while j < len(lines) and lines[j].strip() != "```":
                 j += 1
             k += 1; count += 1
             svg = f"{prefix}-{example}-{k}.svg"
+            while svg in used:  # never let two diagrams share a file name
+                svg = svg[:-4] + "b.svg"
+            used.add(svg)
             render("\n".join(lines[i + 1:j]), os.path.join(diag_dir, svg), build_dir)
             out.append(f"![Example {example} diagram](diagrams/{svg})")
             i = j + 1
