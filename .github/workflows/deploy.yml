@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - v5
+  # Lets the TutorNotes repo trigger a rebuild when the practice files change
+  repository_dispatch:
+    types: [tutornotes-updated]
+  # Adds a "Run workflow" button on the Actions tab
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -21,6 +26,19 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+      - name: Get the latest practice files from TutorNotes
+        uses: actions/checkout@v6
+        with:
+          repository: brandonLaing/TutorNotes
+          ref: main
+          path: _tutornotes
+          token: ${{ secrets.TUTORNOTES_TOKEN || github.token }}
+      - name: Install LaTeX (for the TikZ diagrams)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-pictures texlive-fonts-recommended poppler-utils
+      - name: Copy practice files and turn TikZ into images
+        run: python3 scripts/publish_tutornotes.py _tutornotes content
       - uses: actions/setup-node@v6
         with:
           node-version: 24
