@@ -11,6 +11,7 @@ import hashlib, os, re, shutil, subprocess, sys, tempfile
 FILES = [
     ("Physics 240/Exam Drop-in Sessions/Physics240Exam2-Practice-Problems.md", "Exam Drop-in Sessions", "problems"),
     ("Physics 240/Exam Drop-in Sessions/Physics240Exam2-Practice-Worked.md", "Exam Drop-in Sessions", "worked"),
+    ("Physics 240/Exam Drop-in Sessions/Physics240Exam2-Formula-Sheet.md", "Exam Drop-in Sessions", "formulas"),
 ]
 
 PREAMBLE = r"""\documentclass[border=8pt]{standalone}
